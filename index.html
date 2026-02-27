@@ -7,14 +7,26 @@
 <style>
 * { margin:0; padding:0; box-sizing:border-box; }
 
+html { scroll-behavior: smooth; }
+
 body {
   background: #060412;
   display: flex;
   justify-content: center;
   align-items: flex-start;
   min-height: 100vh;
-  padding: 30px 0;
+  padding: 20px 0;
   font-family: 'Poppins', sans-serif;
+}
+
+/* ── RESPONSIVE POSTER WRAPPER ──
+   The poster itself stays 794px (A4 print width).
+   The wrapper scales it to fit any screen using CSS transform.
+   On desktop: normal. On tablet: scaled down. On mobile: scaled to fill screen.
+*/
+.poster-scaler {
+  width: 794px;
+  transform-origin: top center;
 }
 
 .poster {
@@ -27,6 +39,53 @@ body {
   display: flex;
   flex-direction: column;
   gap: 11px;
+}
+
+/* Tablet landscape (≤900px) */
+@media (max-width: 900px) {
+  body { padding: 0; align-items: flex-start; }
+  .poster-scaler {
+    transform: scale(0.78);
+    transform-origin: top center;
+    margin-bottom: calc((1123px * 0.78) - 1123px);
+  }
+}
+
+/* Tablet portrait (≤768px) */
+@media (max-width: 768px) {
+  .poster-scaler {
+    transform: scale(0.68);
+    transform-origin: top center;
+    margin-bottom: calc((1123px * 0.68) - 1123px);
+  }
+}
+
+/* Large phone landscape (≤640px) */
+@media (max-width: 640px) {
+  .poster-scaler {
+    transform: scale(0.52);
+    transform-origin: top center;
+    margin-bottom: calc((1123px * 0.52) - 1123px);
+  }
+}
+
+/* Phone portrait (≤480px) */
+@media (max-width: 480px) {
+  body { padding: 0; }
+  .poster-scaler {
+    transform: scale(0.42);
+    transform-origin: top center;
+    margin-bottom: calc((1123px * 0.42) - 1123px);
+  }
+}
+
+/* Small phones (≤380px) */
+@media (max-width: 380px) {
+  .poster-scaler {
+    transform: scale(0.34);
+    transform-origin: top center;
+    margin-bottom: calc((1123px * 0.34) - 1123px);
+  }
 }
 
 /* ─── BG LAYERS ─── */
@@ -296,6 +355,7 @@ body {
 </style>
 </head>
 <body>
+<div class="poster-scaler">
 <div class="poster">
 
   <!-- BG -->
@@ -543,9 +603,10 @@ body {
             <div class="person-name">Dr. Imandi Raju</div>
             <div class="person-role">
               <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="#ffd700" stroke-width="2.5" stroke-linecap="round" style="display:inline;vertical-align:middle;margin-right:3px;"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-              Founder, Akash Labs
+              CEO, Akash Labs
             </div>
             <div class="person-cred">Ph.D. — AI &amp; Machine Learning</div>
+            <!-- <div class="person-cred" style="color:rgba(255,255,255,0.4);font-size:7px;font-weight:400;margin-top:1px;">Assistant Professor, SRM-AP University</div> -->
           </div>
         </div>
 
@@ -752,6 +813,36 @@ body {
     </div><!-- end footer-area -->
 
   </div>
-</div>
+</div><!-- end poster -->
+</div><!-- end poster-scaler -->
+
+<script>
+  // Dynamic poster scaling — fits any screen perfectly, print-safe
+  function scalePoster() {
+    const scaler = document.querySelector('.poster-scaler');
+    const posterWidth = 794;
+    const viewportWidth = window.innerWidth;
+    const padding = viewportWidth < 480 ? 0 : viewportWidth < 768 ? 8 : 20;
+    const availableWidth = viewportWidth - (padding * 2);
+    
+    if (availableWidth < posterWidth) {
+      const scale = availableWidth / posterWidth;
+      scaler.style.transform = `scale(${scale})`;
+      scaler.style.transformOrigin = 'top center';
+      // Compensate for the space the scaled-down element would leave
+      const scaledHeight = 1123 * scale;
+      scaler.style.marginBottom = `${scaledHeight - 1123}px`;
+      // Center horizontally accounting for scale
+      scaler.style.marginLeft = `${-((posterWidth - availableWidth) / 2)}px`;
+    } else {
+      scaler.style.transform = 'scale(1)';
+      scaler.style.marginBottom = '0';
+      scaler.style.marginLeft = '0';
+    }
+  }
+
+  scalePoster();
+  window.addEventListener('resize', scalePoster);
+</script>
 </body>
 </html>
